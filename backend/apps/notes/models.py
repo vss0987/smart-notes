@@ -1,3 +1,6 @@
+"""
+Модели приложения Notes.
+"""
 from django.conf import settings
 from django.db import models
 
@@ -5,6 +8,7 @@ User = settings.AUTH_USER_MODEL
 
 
 class Note(models.Model):
+    """Модель заметки пользователя. Содержит заголовок, содержимое и временные метки."""
     user = models.ForeignKey(
         User,
         on_delete=models.CASCADE,

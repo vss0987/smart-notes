@@ -1,3 +1,7 @@
+"""
+Сервисный слой для взаимодействия с YandexGPT API.
+Выполняет суммаризацию переданного текста.
+"""
 import os
 
 import httpx
@@ -15,6 +19,15 @@ class AIProviderError(Exception):
     pass
 
 async def summarize_text(text: str) -> str:
+    """
+    Отправляет текст в YandexGPT для суммаризации.
+
+    Args:
+        text: Исходный текст.
+
+    Returns:
+        Строка с суммаризацией (на русском языке).
+    """
     headers = {
         "Authorization": f"Api-Key {API_KEY}",
         "Content-Type": "application/json",
@@ -24,11 +37,13 @@ async def summarize_text(text: str) -> str:
         "modelUri": f"gpt://{FOLDER_ID}/yandexgpt/latest",
         "completionOptions": {
             "stream": False,
-            "temperature": 0.7,
-            "maxTokens": 1000,
+            "temperature": 0.6,
+            "minTokens": 500,
+            "maxTokens": 1500,
         },
         "messages": [
-            {"role": "system", "text": "Кратко резюмируй текст"},
+            {"role": "system", "text": "Кратко резюмируй текст."
+                                       "Если текст на иностранном языке - кратко резюмируй текст и переведи его на русский язык."},
             {"role": "user", "text": text},
         ],
     }

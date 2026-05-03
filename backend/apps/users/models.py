@@ -1,9 +1,15 @@
+"""
+Модели приложения Users: кастомный пользователь и AI-запросы.
+"""
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
 from django.db import models
 
 
 class UserManager(BaseUserManager):
+    """Менеджер пользователей с email в качестве идентификатора."""
+
     def create_user(self, email, password=None, **extra_fields):
+        """Создаёт и возвращает обычного пользователя."""
         if not email:
             raise ValueError("Email must be set")
         email = self.normalize_email(email)
@@ -13,6 +19,7 @@ class UserManager(BaseUserManager):
         return user
 
     def create_superuser(self, email, password=None, **extra_fields):
+        """Создаёт и возвращает суперпользователя."""
         extra_fields.setdefault("is_staff", True)
         extra_fields.setdefault("is_superuser", True)
         extra_fields.setdefault("is_active", True)
@@ -26,6 +33,7 @@ class UserManager(BaseUserManager):
 
 
 class User(AbstractBaseUser, PermissionsMixin):
+    """Кастомная модель пользователя с аутентификацией по email."""
     email = models.EmailField(unique=True)
     first_name = models.CharField(max_length=50, blank=True)
     last_name = models.CharField(max_length=50, blank=True)
@@ -42,6 +50,7 @@ class User(AbstractBaseUser, PermissionsMixin):
 
 
 class AIRequest(models.Model):
+    """Модель для хранения AI-запросов пользователя и полученных суммаризаций."""
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     input_text = models.TextField()
     summary = models.TextField()

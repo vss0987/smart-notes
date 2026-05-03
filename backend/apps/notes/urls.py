@@ -1,3 +1,6 @@
+"""
+Маршрутизация URL для заметок через ViewSet.
+"""
 from rest_framework.routers import DefaultRouter
 from .views import NoteViewSet
 

@@ -1,8 +1,12 @@
+"""
+Сериализаторы для модели Note.
+"""
 from rest_framework import serializers
 from .models import Note
 
 
 class NoteSerializer(serializers.ModelSerializer):
+    """Сериализатор заметки. id, created_at и updated_at — только для чтения."""
     class Meta:
         model = Note
         fields = (

@@ -1,8 +1,15 @@
+"""
+Модели для хранения AI-запросов и ответов.
+"""
 from django.db import models
 from ..notes.models import Note
 
 
 class AIRequest(models.Model):
+    """
+    Модель AI-запроса к заметке.
+    Хранит тип запроса, переданный промпт и полученный ответ от AI-сервиса.
+    """
     SUMMARY = "summary"
     TODO = "todo"
     TAGS = "tags"

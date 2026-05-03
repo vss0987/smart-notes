@@ -21,7 +21,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/6.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.getenv('SECRET_KEY')
+SECRET_KEY = os.getenv('SECRET_KEY', 'django-insecure-fallback-key-for-development-only')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     'apps.users.apps.UsersConfig',
     'apps.notes.apps.NotesConfig',
     "corsheaders",
+    'social_django',
 
 ]
 
@@ -95,6 +96,14 @@ DATABASES = {
 AUTH_USER_MODEL = 'users.User'
 
 
+AUTHENTICATION_BACKENDS = [
+    'social_core.backends.github.GithubOAuth2',
+    'django.contrib.auth.backends.ModelBackend',
+    'users.authentication.EmailAuthBackend',
+]
+
+
+
 AUTH_PASSWORD_VALIDATORS = [
     {
         'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
@@ -145,3 +154,4 @@ SIMPLE_JWT = {
 }
 
 AI_SERVICE_URL = os.getenv("AI_SERVICE_URL", "http://localhost:8001")
+DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
