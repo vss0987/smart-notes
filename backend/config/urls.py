@@ -2,7 +2,7 @@
 Корневая URL-конфигурация проекта config.
 Объединяет маршруты админки, JWT-аутентификации, AI-сервиса, заметок и социальной аутентификации.
 """
-from apps.users.views import EmailTokenObtainPairView
+from apps.users.views import EmailTokenObtainPairView, RegisterView
 from django.contrib import admin
 from django.http import JsonResponse
 from django.urls import path, include
@@ -22,6 +22,9 @@ urlpatterns = [
     # Админка Django
     path("admin/", admin.site.urls),
 
+    # Регистрация нового пользователя
+    path("api/users/register/", RegisterView.as_view(), name="register"),
+
     # JWT-аутентификация (получение и обновление токенов)
     path("api/token/", EmailTokenObtainPairView.as_view(), name="token_obtain_pair"),
     path("api/token/refresh/", TokenRefreshView.as_view(), name="token_refresh"),
@@ -29,7 +32,7 @@ urlpatterns = [
     # Проверка здоровья сервиса
     path('api/health/', health_check, name='health'),
 
-    # AI-сервис
+    # AI-сервис (суммаризация + история запросов пользователя)
     path("api/ai/", include("ai.urls")),
 
     # Notes API
