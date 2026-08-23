@@ -57,3 +57,4 @@ async def summarize_text(text: str) -> str:
         raise Exception(f"YandexGPT error: {data}")
 
     return data["result"]["alternatives"][0]["message"]["text"]
+

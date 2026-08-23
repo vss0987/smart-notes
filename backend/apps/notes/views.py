@@ -24,9 +24,18 @@ class NoteViewSet(ModelViewSet):
         return get_user_notes(user=self.request.user)
 
     def perform_create(self, serializer):
-        """Создаёт заметку, привязывая её к текущему пользователю."""
-        create_note(
+        """
+        Создаёт заметку, привязывая её к текущему пользователю.
+
+        Важно: результат create_note() присваивается serializer.instance —
+        без этого DRF после perform_create() пытается сериализовать
+        serializer.validated_data (обычный dict без id/created_at/updated_at,
+        так как это read-only поля) вместо реальной модели, и ответ клиенту
+        получается битым или падает с ошибкой.
+        """
+        note = create_note(
             user=self.request.user,
             title=serializer.validated_data["title"],
             content=serializer.validated_data["content"],
         )
+        serializer.instance = note

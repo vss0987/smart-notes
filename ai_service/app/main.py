@@ -2,6 +2,9 @@
 Основной модуль AI-сервиса на FastAPI.
 Содержит эндпоинты для суммаризации текста и проверки здоровья сервиса.
 """
+from dotenv import load_dotenv
+load_dotenv()
+
 from fastapi import FastAPI, Depends
 from app.schemas import SummaryRequest, SummaryResponse
 from app.security import verify_internal_token

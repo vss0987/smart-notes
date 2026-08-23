@@ -12,9 +12,14 @@ https://docs.djangoproject.com/en/6.0/ref/settings/
 import os
 from pathlib import Path
 from datetime import timedelta
+from dotenv import load_dotenv
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
+
+# .env лежит в корне проекта (smart_notes/), на уровень выше backend/,
+# поэтому BASE_DIR.parent, а не BASE_DIR.
+load_dotenv(BASE_DIR.parent / ".env")
 
 
 # Quick-start development settings - unsuitable for production
@@ -38,6 +43,9 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'rest_framework',
+    'rest_framework_simplejwt',
+    'rest_framework_simplejwt.token_blacklist',
     'apps.ai.apps.AiConfig',
     'apps.users.apps.UsersConfig',
     'apps.notes.apps.NotesConfig',
@@ -48,13 +56,17 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    # CorsMiddleware должен стоять как можно выше (документация django-cors-headers) —
+    # особенно перед CommonMiddleware, иначе браузерный preflight (OPTIONS),
+    # который автоматически уходит перед POST с Content-Type: application/json,
+    # может не получить нужных заголовков вовремя.
+    "corsheaders.middleware.CorsMiddleware",
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    "corsheaders.middleware.CorsMiddleware",
 ]
 
 ROOT_URLCONF = 'config.urls'
@@ -99,7 +111,12 @@ AUTH_USER_MODEL = 'users.User'
 AUTHENTICATION_BACKENDS = [
     'social_core.backends.github.GithubOAuth2',
     'django.contrib.auth.backends.ModelBackend',
-    'users.authentication.EmailAuthBackend',
+    # Кастомный EmailAuthBackend убран: модуль 'users.authentication' не
+    # существует (ModuleNotFoundError валил /admin/, /api/ и все страницы,
+    # где Django вызывает has_module_perms). ModelBackend уже умеет
+    # аутентифицировать по email, так как USERNAME_FIELD = "email".
+    # Если у вас была своя логика в EmailAuthBackend — пришлите файл,
+    # вернём с исправленным путём импорта (apps.users.authentication...).
 ]
 
 
@@ -136,6 +153,7 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/6.0/howto/static-files/
 
 STATIC_URL = 'static/'
+STATICFILES_DIRS = [BASE_DIR / "static"]
 
 
 REST_FRAMEWORK = {
@@ -148,8 +166,10 @@ REST_FRAMEWORK = {
 }
 
 SIMPLE_JWT = {
-    "ACCESS_TOKEN_LIFETIME": timedelta(days=100),
+    "ACCESS_TOKEN_LIFETIME": timedelta(days=1),
     "REFRESH_TOKEN_LIFETIME": timedelta(days=7),
+    "ROTATE_REFRESH_TOKENS": True,
+    "BLACKLIST_AFTER_ROTATION": True,
     "AUTH_HEADER_TYPES": ("Bearer",),
 }
 
